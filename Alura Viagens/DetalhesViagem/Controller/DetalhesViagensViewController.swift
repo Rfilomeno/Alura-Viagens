@@ -17,6 +17,7 @@ class DetalhesViagensViewController: UIViewController {
     @IBOutlet weak var labelPrecoPacoteViagem: UILabel!
     @IBOutlet weak var scrollPrincipal: UIScrollView!
     @IBOutlet weak var textFieldData: UITextField!
+    @IBOutlet weak var botaoFinalizarCompra: UIButton!
     
     var pacoteSelecionado:PacoteViagem? = nil
     
@@ -24,6 +25,7 @@ class DetalhesViagensViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(aumentarScroll(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        botaoFinalizarCompra.layer.cornerRadius = 8
         
         if let pacote = pacoteSelecionado{
             self.imagemPacoteViagem.image = UIImage(named: pacote.viagem.caminhoDaImagem)
@@ -41,10 +43,13 @@ class DetalhesViagensViewController: UIViewController {
         
     }
     @IBAction func botaoVoltar(_ sender: UIButton) {
-        self.dismiss(animated: true, completion: nil)
+        if let navigation = self.navigationController{
+            navigation.popViewController(animated: true)
+        }
+        
         
     }
-    func exibeDataTextField(sender: UIDatePicker){
+    @objc func exibeDataTextField(sender: UIDatePicker){
         let formatador = DateFormatter()
         formatador.dateFormat = "dd MM yyyy"
         self.textFieldData.text = formatador.string(from: sender.date)
@@ -54,5 +59,14 @@ class DetalhesViagensViewController: UIViewController {
         datePickerView.datePickerMode = .date
         datePickerView.addTarget(self, action: #selector(exibeDataTextField(sender:)), for: .valueChanged)
         sender.inputView = datePickerView
+    }
+    
+    
+    @IBAction func botaoFinalizarCompra(_ sender: UIButton) {
+        let storyBoard = UIStoryboard(name: "Main", bundle: nil)
+        let controller = storyBoard.instantiateViewController(withIdentifier: "confirmacaoPagamento") as! ConfirmacaoPagamentoViewController
+        controller.pacoteComprado = pacoteSelecionado
+        self.navigationController?.pushViewController(controller, animated: true)
+        
     }
 }

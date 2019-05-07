@@ -34,14 +34,8 @@ class PacotesViagensViewController: UIViewController, UICollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let celulaPacote = collectionView.dequeueReusableCell(withReuseIdentifier: "celulaPacote", for: indexPath) as! PacoteViagemCollectionViewCell
         let pacoteAtual = listaViagens[indexPath.item]
+        celulaPacote.configuraCelula(pacote: pacoteAtual)
         
-        celulaPacote.labelTitulo.text = pacoteAtual.viagem.titulo
-        celulaPacote.labelQuantidadeDeDias.text = "\(pacoteAtual.viagem.quantidadeDeDias) dias"
-        celulaPacote.labelPreco.text = "R$ \(pacoteAtual.viagem.preco)"
-        celulaPacote.imagemViagem.image = UIImage(named: pacoteAtual.viagem.caminhoDaImagem)
-        celulaPacote.layer.borderWidth = 0.5
-        celulaPacote.layer.borderColor = UIColor(red: 85.0/255.0, green: 85.0/255.0, blue: 85.0/255.0, alpha: 1).cgColor
-        celulaPacote.layer.cornerRadius = 8
         return celulaPacote
         
     }
@@ -49,8 +43,9 @@ class PacotesViagensViewController: UIViewController, UICollectionViewDataSource
     
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let larguraDaCelula = (collectionView.bounds.width / 2) - 15
-        return CGSize(width: larguraDaCelula, height: 160)
+        
+        return UIDevice.current.userInterfaceIdiom == .phone ? CGSize(width: (collectionView.bounds.width / 2) - 20, height: 160) : CGSize(width: (collectionView.bounds.width / 3) - 20, height: 250)
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -58,15 +53,14 @@ class PacotesViagensViewController: UIViewController, UICollectionViewDataSource
         let storybord = UIStoryboard(name: "Main", bundle: nil)
         let controller = storybord.instantiateViewController(withIdentifier: "detalhes") as! DetalhesViagensViewController
         controller.pacoteSelecionado = pacote
-        self.present(controller,animated: true,completion: nil)
-        
+        self.navigationController?.pushViewController(controller, animated: true)
         
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         listaViagens = listaComTodasViagens
         if searchText != "" {
-            let filtroListaViagem = NSPredicate(format: "titulo contains %@", searchText)
+            let filtroListaViagem = NSPredicate(format: "viagem.titulo contains %@", searchText)
             let listaFiltrada:Array<PacoteViagem> = (listaViagens as NSArray).filtered(using: filtroListaViagem) as! Array<PacoteViagem>
             listaViagens = listaFiltrada
         }
